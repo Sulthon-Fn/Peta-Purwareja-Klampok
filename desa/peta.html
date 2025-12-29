@@ -524,29 +524,103 @@
         map.addLayer(layer_desa);
         bounds_group.addLayer(layer_desa);
 
+        // ========== QGIS Style for Batas RW (from original export) ==========
+        function style_BatasRW_2(feature) {
+            var rwValue = String(feature.properties['RW'] || feature.properties['rw'] || '').trim();
+            switch(rwValue) {
+                case 'RW 01': case '01': case '1':
+                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(233,238,133,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(233,238,133,0.3)', interactive: true };
+                case 'RW 02': case '02': case '2':
+                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(221,65,211,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(221,65,211,0.3)', interactive: true };
+                case 'RW 03': case '03': case '3':
+                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(85,74,231,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(85,74,231,0.3)', interactive: true };
+                case 'RW 04': case '04': case '4':
+                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(219,116,108,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(219,116,108,0.3)', interactive: true };
+                case 'RW 5': case 'RW 05': case '05': case '5':
+                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(79,197,203,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(79,197,203,0.3)', interactive: true };
+                default:
+                    return { pane: 'pane_rw', opacity: 1, color: '#FFEB3B', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: '#FFEB3B', interactive: true };
+            }
+        }
+
+        // ========== QGIS Style for RT/RW (from original export) ==========
+        function style_rt_rw_3(feature) {
+            var rtRwValue = String(feature.properties['RT/RW'] || feature.properties['rt_rw'] || '').trim();
+            switch(rtRwValue) {
+                case 'RT 01 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(214,25,28,1.0)', interactive: true };
+                case 'RT 01 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(230,42,167,1.0)', interactive: true };
+                case 'RT 01 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(155,89,182,1.0)', interactive: true };
+                case 'RT 01 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(52,152,219,1.0)', interactive: true };
+                case 'RT 01 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(231,61,56,1.0)', interactive: true };
+                case 'RT 02 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(215,164,114,1.0)', interactive: true };
+                case 'RT 02 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(216,229,133,1.0)', interactive: true };
+                case 'RT 02 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(233,136,151,1.0)', interactive: true };
+                case 'RT 02 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(220,82,28,1.0)', interactive: true };
+                case 'RT 03 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(41,217,230,1.0)', interactive: true };
+                case 'RT 03 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(105,232,70,1.0)', interactive: true };
+                case 'RT 03 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(228,108,202,1.0)', interactive: true };
+                case 'RT 03 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(25,38,220,1.0)', interactive: true };
+                case 'RT 03 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(56,226,164,1.0)', interactive: true };
+                case 'RT 04 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(37,219,73,1.0)', interactive: true };
+                case 'RT 04 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(109,172,234,1.0)', interactive: true };
+                case 'RT 04 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(94,27,217,1.0)', interactive: true };
+                case 'RT 04 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(157,233,15,1.0)', interactive: true };
+                case 'RT 04 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(130,31,205,1.0)', interactive: true };
+                case 'RT 05 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(221,124,179,1.0)', interactive: true };
+                case 'RT 05 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(97,134,228,1.0)', interactive: true };
+                case 'RT 05 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(238,226,99,1.0)', interactive: true };
+                case 'RT 05 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(81,53,237,1.0)', interactive: true };
+                case 'RT 05 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(205,44,33,1.0)', interactive: true };
+                case 'RT 06 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(45,224,197,1.0)', interactive: true };
+                case 'RT 06 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(243,156,18,1.0)', interactive: true };
+                case 'RT 06 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(46,204,113,1.0)', interactive: true };
+                case 'RT 06 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(142,68,173,1.0)', interactive: true };
+                case 'RT 07 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(41,128,185,1.0)', interactive: true };
+                case 'RT 07 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(231,76,60,1.0)', interactive: true };
+                case 'RT 08 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(189,195,199,1.0)', interactive: true };
+                default: return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: 'rgba(100,100,100,0.6)', interactive: true };
+            }
+        }
+
         // ========== Batas RW ==========
         map.createPane('pane_rw');
         map.getPane('pane_rw').style.zIndex = 402;
         
         var layer_rw = new L.geoJson(json_BatasRW_2, {
             pane: 'pane_rw',
-            style: function() {
-                return {
-                    color: '#FFEB3B',
-                    weight: 2,
-                    fillOpacity: 0.05,
-                    fillColor: '#FFEB3B',
-                    dashArray: '5,5'
-                };
-            },
+            style: style_BatasRW_2,
             onEachFeature: function(feature, layer) {
+                var rwValue = feature.properties['RW'] || feature.properties['rw'] || '-';
                 var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
                     <tr>\
                         <th style="padding: 6px 10px; background: #0F2C59; color: white;">RW</th>\
-                        <td style="padding: 6px 10px;">' + (feature.properties['RW'] || feature.properties['rw'] || '-') + '</td>\
+                        <td style="padding: 6px 10px; font-weight: 600;">' + rwValue + '</td>\
                     </tr>\
                 </table>';
                 layer.bindPopup(popupContent);
+                
+                layer.on('mouseover', function(e) {
+                    var currentStyle = style_BatasRW_2(feature);
+                    originalStyles[L.stamp(e.target)] = {
+                        weight: currentStyle.weight,
+                        color: currentStyle.color,
+                        fillOpacity: currentStyle.fillOpacity,
+                        fillColor: currentStyle.fillColor
+                    };
+                    e.target.setStyle({
+                        weight: 6,
+                        color: '#F59E0B',
+                        fillOpacity: 0.4,
+                        fillColor: '#F59E0B'
+                    });
+                });
+                layer.on('mouseout', function(e) {
+                    var key = L.stamp(e.target);
+                    if (originalStyles[key]) {
+                        e.target.setStyle(originalStyles[key]);
+                        delete originalStyles[key];
+                    }
+                });
             }
         });
         map.addLayer(layer_rw);
@@ -557,20 +631,15 @@
         
         var layer_rtRw = new L.geoJson(json_rt_rw_3, {
             pane: 'pane_rtRw',
-            style: function(feature) {
-                var colors = ['#4CAF50', '#2196F3', '#9C27B0', '#FF9800', '#00BCD4', '#E91E63'];
-                var rw = feature.properties['RW'] || feature.properties['rw'] || 1;
-                return {
-                    color: colors[(rw - 1) % colors.length],
-                    weight: 2,
-                    fillOpacity: 0.15,
-                    fillColor: colors[(rw - 1) % colors.length]
-                };
-            },
+            style: style_rt_rw_3,
             onEachFeature: function(feature, layer) {
+                var rtRwValue = feature.properties['RT/RW'] || feature.properties['rt_rw'] || '-';
                 var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
                     <tr>\
-                        <th style="padding: 6px 10px; background: #0F2C59; color: white;">RT</th>\
+                        <th style="padding: 6px 10px; background: #0F2C59; color: white;" colspan="2">' + rtRwValue + '</th>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 6px 10px; background: #f1f5f9;">RT</th>\
                         <td style="padding: 6px 10px;">' + (feature.properties['RT'] || feature.properties['rt'] || '-') + '</td>\
                     </tr>\
                     <tr>\
@@ -581,11 +650,18 @@
                 layer.bindPopup(popupContent);
                 
                 layer.on('mouseover', function(e) {
+                    var currentStyle = style_rt_rw_3(feature);
                     originalStyles[L.stamp(e.target)] = {
-                        weight: e.target.options.weight,
-                        fillOpacity: e.target.options.fillOpacity
+                        weight: currentStyle.weight,
+                        color: currentStyle.color,
+                        fillOpacity: currentStyle.fillOpacity,
+                        fillColor: currentStyle.fillColor
                     };
-                    e.target.setStyle({ weight: 4, fillOpacity: 0.4 });
+                    e.target.setStyle({
+                        weight: 4,
+                        color: '#F59E0B',
+                        fillOpacity: 0.9
+                    });
                 });
                 layer.on('mouseout', function(e) {
                     var key = L.stamp(e.target);

@@ -304,7 +304,7 @@
                             <div class="layer-section">
                                 <p class="layer-section-title">Infrastruktur</p>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="jalan" checked>
+                                    <input type="checkbox" data-layer-key="jalan">
                                     <span>Jalan</span>
                                 </label>
                             </div>
@@ -617,6 +617,50 @@
                     fillOpacity: 0.1,
                     fillColor: '#FF5722'
                 };
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                    <tr>\
+                        <th style="padding: 8px; background: #0F2C59; color: white;">Nama Desa</th>\
+                        <td style="padding: 8px; font-weight: 600;">' + (feature.properties['Nama'] || 'Kecitran') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Luas</th>\
+                        <td style="padding: 8px;">' + (feature.properties['luas'] || '± 241 Ha') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Penduduk</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml pend'] || '± 3.500 Jiwa') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Dusun</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml dusun'] || '3 Dusun') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah RW</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml rw'] || '5 RW') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah RT</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml rt'] || '31 RT') + '</td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
+                
+                layer.on('mouseover', function(e) {
+                    e.target.setStyle({
+                        weight: 5,
+                        color: '#F59E0B',
+                        fillOpacity: 0.3
+                    });
+                });
+                layer.on('mouseout', function(e) {
+                    e.target.setStyle({
+                        color: '#FF5722',
+                        weight: 3,
+                        fillOpacity: 0.1
+                    });
+                });
             }
         });
 
@@ -667,7 +711,6 @@
                 };
             }
         });
-        map.addLayer(layer_jalan);
 
         // ========== Point Layers ==========
         function createPointLayer(data, pane, iconHtml, popupFields) {
