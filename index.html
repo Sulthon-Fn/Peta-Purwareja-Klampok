@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>Geoportal Kecamatan Purwareja Klampok</title>
+        <meta name="description" content="Sistem Informasi Geografis Kecamatan Purwareja Klampok, Kabupaten Banjarnegara - Platform pemetaan digital wilayah kecamatan.">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary-color: #0F2C59;
+                --secondary-color: #059669;
+                --accent-color: #F59E0B;
+                --bg-color: #F8FAFC;
+                --card-bg: #FFFFFF;
+                --text-main: #1E293B;
+                --text-muted: #64748B;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+                --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            * { box-sizing: border-box; }
+
+            body {
+                margin: 0;
+                font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+                color: var(--text-main);
+                background: var(--bg-color);
+                min-height: 100vh;
+                scroll-behavior: smooth;
+            }
+
+            a { color: inherit; text-decoration: none; }
+
+            header {
+                position: sticky;
+                top: 0;
+                z-index: 1200;
+                background: var(--primary-color);
+                border-bottom: 3px solid var(--secondary-color);
+                box-shadow: var(--shadow);
+            }
+
+            .nav-bar {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 16px 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 700;
+                letter-spacing: 0.4px;
+                color: #fff;
+            }
+
+            .brand img {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                object-fit: contain;
+                background: rgba(255,255,255,0.15);
+                padding: 8px;
+            }
+
+            .menu {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                font-weight: 600;
+                color: rgba(255,255,255,0.9);
+            }
+
+            .menu a { padding: 10px 12px; border-radius: 10px; transition: all 300ms var(--ease-out-expo); }
+            .menu a:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-2px); }
+
+            .menu .pill {
+                background: var(--accent-color);
+                color: var(--primary-color);
+                font-weight: 700;
+                box-shadow: var(--shadow);
+            }
+
+            .menu-toggle {
+                display: none;
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,0.3);
+                background: rgba(255,255,255,0.1);
+                color: #fff;
+                font-size: 20px;
+                cursor: pointer;
+            }
+
+            main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 72px; }
+
+            .hero {
+                margin-top: 36px;
+                padding: 48px 32px;
+                border-radius: 16px;
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                    linear-gradient(135deg, rgba(15, 44, 89, 0.95) 0%, rgba(15, 44, 89, 0.85) 50%, rgba(30, 30, 47, 0.9) 100%);
+                background-size: auto, cover;
+                background-position: center, center;
+                border: none;
+                box-shadow: var(--shadow-lg);
+                position: relative;
+                overflow: hidden;
+                text-align: center;
+            }
+
+            .hero::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, transparent 0%, rgba(15, 44, 89, 0.3) 100%);
+                pointer-events: none;
+            }
+
+            .hero::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+            }
+
+            .hero > * { position: relative; z-index: 1; }
+
+            .hero h1 { 
+                font-size: clamp(32px, 5vw, 52px); 
+                margin: 0 0 16px; 
+                letter-spacing: -0.5px; 
+                color: #fff;
+                font-weight: 700;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+            .hero p { 
+                margin: 0 0 28px; 
+                color: rgba(255,255,255,0.85); 
+                max-width: 720px; 
+                line-height: 1.7;
+                margin-left: auto;
+                margin-right: auto;
+                font-size: 18px;
+            }
+
+            .cta-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 24px;
+                border-radius: 8px;
+                font-weight: 700;
+                border: none;
+                transition: transform 400ms var(--ease-out-back), box-shadow 400ms var(--ease-out-expo);
+                cursor: pointer;
+            }
+
+            .btn-primary {
+                background: var(--accent-color);
+                color: var(--primary-color);
+                box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-4px) scale(1.02);
+                box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+            }
+
+            .btn-ghost { 
+                background: transparent; 
+                color: #fff; 
+                border: 2px solid rgba(255,255,255,0.4); 
+            }
+            .btn-ghost:hover { 
+                background: rgba(255,255,255,0.1); 
+                border-color: rgba(255,255,255,0.6);
+                transform: translateY(-3px) scale(1.02);
+            }
+
+            .section-title {
+                font-size: 26px;
+                margin: 48px 0 20px;
+                letter-spacing: -0.3px;
+                color: var(--primary-color);
+                font-weight: 700;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 600ms var(--ease-out-expo);
+            }
+            .section-title.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .card-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+            .card {
+                background: var(--card-bg);
+                border: none;
+                border-radius: 12px;
+                border-top: 4px solid var(--secondary-color);
+                padding: 24px;
+                box-shadow: var(--shadow);
+                transition: transform 500ms var(--ease-out-back), box-shadow 400ms var(--ease-out-expo), opacity 600ms var(--ease-out-expo);
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            .card.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .card:hover { 
+                transform: translateY(-6px) scale(1.01); 
+                box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.18); 
+            }
+
+            .card h3 { 
+                color: var(--primary-color); 
+                margin: 0 0 12px;
+                font-size: 18px;
+            }
+
+            .card-accent {
+                border-top-color: var(--accent-color);
+            }
+
+            .bio-list { list-style: none; padding: 0; margin: 12px 0 0; color: var(--text-muted); line-height: 1.8; }
+            .bio-list li { padding: 4px 0; }
+            .bio-list strong { color: var(--text-main); }
+
+            .summary-text {
+                color: var(--text-muted);
+                line-height: 1.8;
+                margin: 0;
+            }
+
+            /* Data Table Styles */
+            .data-table-container {
+                background: var(--card-bg);
+                border-radius: 12px;
+                border-top: 4px solid var(--accent-color);
+                padding: 24px;
+                box-shadow: var(--shadow);
+                margin-top: 20px;
+                overflow-x: auto;
+            }
+
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+            }
+
+            .data-table thead {
+                background: linear-gradient(135deg, var(--primary-color), #1a3a6e);
+                color: #fff;
+            }
+
+            .data-table th {
+                padding: 14px 16px;
+                text-align: left;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-size: 12px;
+            }
+
+            .data-table th:first-child { border-radius: 8px 0 0 0; }
+            .data-table th:last-child { border-radius: 0 8px 0 0; }
+
+            .data-table td {
+                padding: 12px 16px;
+                border-bottom: 1px solid rgba(15, 44, 89, 0.08);
+            }
+
+            .data-table tbody tr {
+                transition: all 300ms var(--ease-out-expo);
+            }
+
+            .data-table tbody tr:hover {
+                background: rgba(5, 150, 105, 0.06);
+                transform: scale(1.01);
+            }
+
+            .data-table tfoot {
+                background: rgba(15, 44, 89, 0.05);
+                font-weight: 700;
+            }
+
+            .data-table tfoot td {
+                padding: 14px 16px;
+                border-top: 2px solid var(--secondary-color);
+            }
+
+            .percentage-bar {
+                height: 8px;
+                background: rgba(15, 44, 89, 0.1);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-top: 6px;
+            }
+
+            .percentage-fill {
+                height: 100%;
+                background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+                border-radius: 4px;
+                transition: width 800ms var(--ease-out-expo);
+            }
+
+            footer {
+                margin-top: 64px;
+                padding: 32px 20px;
+                text-align: center;
+                background: var(--primary-color);
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .ribbon {
+                display: inline-flex;
+                gap: 10px;
+                align-items: center;
+                padding: 10px 14px;
+                border-radius: 14px;
+                background: rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                margin-bottom: 18px;
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 600;
+            }
+
+            .floating {
+                animation: float 7s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                25% { transform: translateY(-8px) rotate(0.5deg); }
+                50% { transform: translateY(-12px) rotate(0deg); }
+                75% { transform: translateY(-6px) rotate(-0.5deg); }
+            }
+
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(40px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .hero h1, .hero p, .hero .cta-row, .hero .ribbon {
+                animation: fadeInUp 800ms var(--ease-out-expo) backwards;
+            }
+            .hero .ribbon { animation-delay: 0ms; }
+            .hero h1 { animation-delay: 100ms; }
+            .hero p { animation-delay: 200ms; }
+            .hero .cta-row { animation-delay: 350ms; }
+
+            @media (max-width: 820px) {
+                .nav-bar { flex-wrap: wrap; }
+                .menu { width: 100%; display: none; flex-direction: column; align-items: flex-start; }
+                .menu.show { display: flex; }
+                .menu a { width: 100%; padding: 12px; }
+                .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+                main { padding: 24px 18px 56px; }
+                .hero { padding: 24px; }
+                .data-table { font-size: 12px; }
+                .data-table th, .data-table td { padding: 10px 12px; }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="nav-bar">
+                <div class="brand">
+                    <img src="kecamatan/images/Banjarnegara.png" alt="Logo Kabupaten Banjarnegara">
+                    <span>Geoportal Kec. Purwareja Klampok</span>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+                <nav class="menu" aria-label="Navigasi utama">
+                    <a href="kecamatan/peta.html" class="pill">🗺️ Peta Kecamatan</a>
+                    <a href="desa/peta.html">🏘️ Peta Desa Kecitran</a>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero" id="beranda">
+                <div class="ribbon floating">Geoportal Spatial • Purwareja Klampok</div>
+                <h1>Sistem Informasi Geografis Kecamatan Purwareja Klampok</h1>
+                <p>Platform pemetaan digital yang menyajikan data spatial batas administrasi desa-desa, sebaran infrastruktur, dan sarana publik secara interaktif di wilayah Kecamatan Purwareja Klampok, Kabupaten Banjarnegara.</p>
+                <div class="cta-row">
+                    <a class="btn btn-primary" href="kecamatan/peta.html">🗺️ Buka Peta Kecamatan</a>
+                    <a class="btn btn-ghost" href="desa/peta.html">🏘️ Lihat Peta Desa Kecitran</a>
+                </div>
+            </section>
+
+            <!-- Executive Summary Section -->
+            <section id="summary">
+                <h2 class="section-title">📋 Deskripsi Umum (Executive Summary)</h2>
+                <div class="card-grid">
+                    <div class="card card-accent" style="grid-column: 1 / -1;">
+                        <h3>Tentang Sistem Informasi Geografis Ini</h3>
+                        <p class="summary-text">
+                            Sistem Informasi Geografis (SIG/GIS) Kecamatan Purwareja Klampok merupakan platform pemetaan digital berbasis web yang dikembangkan untuk menyajikan data spasial wilayah kecamatan secara interaktif dan informatif. Sistem ini memvisualisasikan batas-batas administrasi 8 desa yang berada di Kecamatan Purwareja Klampok, yaitu: <strong>Kalimandi, Klampok, Kalilandak, Purwareja, Pagak, Sirkandi, Kecitran,</strong> dan <strong>Kaliwinasuh</strong>.
+                        </p>
+                        <br>
+                        <p class="summary-text">
+                            Platform ini dibangun menggunakan teknologi <strong>QGIS</strong> untuk pengolahan data geospasial dan <strong>Leaflet.js</strong> sebagai library peta interaktif berbasis JavaScript. Data disajikan di atas layer <strong>Google Satellite</strong> untuk memberikan konteks visual yang akurat terhadap kondisi wilayah sesungguhnya. Sistem dilengkapi dengan fitur <strong>hover highlight</strong> untuk menyoroti area desa, popup informasi detail, dan layer control untuk mengatur visibilitas data.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profil Wilayah Section -->
+            <section id="profil">
+                <h2 class="section-title">🏛️ Profil Wilayah Kecamatan</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>📍 Informasi Administratif</h3>
+                        <ul class="bio-list">
+                            <li><strong>Nama Kecamatan:</strong> Purwareja Klampok</li>
+                            <li><strong>Kabupaten:</strong> Banjarnegara</li>
+                            <li><strong>Provinsi:</strong> Jawa Tengah</li>
+                            <li><strong>Negara:</strong> Indonesia</li>
+                            <li><strong>Jumlah Desa:</strong> 8 Desa</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Data Statistik Wilayah</h3>
+                        <ul class="bio-list">
+                            <li><strong>Total Luas:</strong> ± 2.736 Ha</li>
+                            <li><strong>Desa Terluas:</strong> Kaliwinasuh (568 Ha)</li>
+                            <li><strong>Desa Terkecil:</strong> Klampok (124 Ha)</li>
+                            <li><strong>Koordinat Pusat:</strong> -7.474, 109.455</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🗺️ Batas Wilayah</h3>
+                        <ul class="bio-list">
+                            <li><strong>Utara:</strong> Kec. Mandiraja</li>
+                            <li><strong>Selatan:</strong> Kec. Bawang</li>
+                            <li><strong>Barat:</strong> Kec. Purwanegara</li>
+                            <li><strong>Timur:</strong> Kec. Rakit</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daftar Desa Section -->
+            <section id="desa-list">
+                <h2 class="section-title">🏘️ Daftar Desa di Kecamatan Purwareja Klampok</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>1. Desa Kalimandi</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 298 Ha</li>
+                            <li><strong>Persentase:</strong> 10,89%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>2. Desa Klampok</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 124 Ha</li>
+                            <li><strong>Persentase:</strong> 4,53%</li>
+                            <li><strong>Keterangan:</strong> Pusat Kecamatan</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>3. Desa Kalilandak</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 392 Ha</li>
+                            <li><strong>Persentase:</strong> 14,33%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>4. Desa Purwareja</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 287 Ha</li>
+                            <li><strong>Persentase:</strong> 10,49%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>5. Desa Pagak</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 421 Ha</li>
+                            <li><strong>Persentase:</strong> 15,39%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>6. Desa Sirkandi</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 405 Ha</li>
+                            <li><strong>Persentase:</strong> 14,80%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>7. Desa Kecitran</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 241 Ha</li>
+                            <li><strong>Persentase:</strong> 8,81%</li>
+                            <li><strong>Keterangan:</strong> <a href="desa/peta.html" style="color: var(--secondary-color);">Lihat Peta Detail →</a></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>8. Desa Kaliwinasuh</h3>
+                        <ul class="bio-list">
+                            <li><strong>Luas:</strong> ± 568 Ha</li>
+                            <li><strong>Persentase:</strong> 20,76%</li>
+                            <li><strong>Keterangan:</strong> Desa Terluas</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistik Luas Desa -->
+            <section id="statistik">
+                <h2 class="section-title">📊 Statistik Persentase Luas Wilayah Desa</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Desa</th>
+                                <th>Luas (Ha)</th>
+                                <th>Persentase</th>
+                                <th>Visual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Kaliwinasuh</td>
+                                <td>568</td>
+                                <td>20,76%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 100%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Pagak</td>
+                                <td>421</td>
+                                <td>15,39%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 74%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Sirkandi</td>
+                                <td>405</td>
+                                <td>14,80%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 71%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Kalilandak</td>
+                                <td>392</td>
+                                <td>14,33%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 69%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Kalimandi</td>
+                                <td>298</td>
+                                <td>10,89%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 52%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Purwareja</td>
+                                <td>287</td>
+                                <td>10,49%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 51%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>Kecitran</td>
+                                <td>241</td>
+                                <td>8,81%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 42%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>Klampok</td>
+                                <td>124</td>
+                                <td>4,53%</td>
+                                <td>
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 22%;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2"><strong>TOTAL</strong></td>
+                                <td><strong>2.736</strong></td>
+                                <td><strong>100,00%</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Profil Pengembang -->
+            <section id="pengembang">
+                <h2 class="section-title">👨‍💻 Profil Pengembang</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>Biodata Pengembang</h3>
+                        <ul class="bio-list">
+                            <li><strong>Nama:</strong> Sulthon Fadhlun Nafi</li>
+                            <li><strong>NIM:</strong> 23SA21A063</li>
+                            <li><strong>Kelas:</strong> SI 23B GIS</li>
+                            <li><strong>Universitas:</strong> Amikom Purwokerto</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Teknologi yang Digunakan</h3>
+                        <ul class="bio-list">
+                            <li><strong>GIS Software:</strong> QGIS Desktop</li>
+                            <li><strong>Web Mapping:</strong> Leaflet.js</li>
+                            <li><strong>Export Tool:</strong> QGIS2Web Plugin</li>
+                            <li><strong>Basemap:</strong> Google Satellite</li>
+                            <li><strong>Data Format:</strong> GeoJSON</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            © 2025 Sistem Informasi Geografis Kecamatan Purwareja Klampok. Dikembangkan oleh Sulthon FN (Universitas Amikom Purwokerto). Dibuat menggunakan QGIS &amp; Leaflet JS.
+        </footer>
+
+        <script>
+            // Fluid Animation System
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const animationObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        const delay = entry.target.classList.contains('card') 
+                            ? index * 100 
+                            : 0;
+                        
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, delay);
+                        
+                        animationObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.card, .section-title').forEach(el => {
+                animationObserver.observe(el);
+            });
+
+            // Menu toggle
+            const toggle = document.querySelector('.menu-toggle');
+            const menu = document.querySelector('.menu');
+            if (toggle && menu) {
+                toggle.addEventListener('click', () => menu.classList.toggle('show'));
+            }
+
+            // Smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

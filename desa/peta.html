@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Peta Interaktif - Desa Kecitran</title>
+        <meta name="description" content="Peta interaktif berbasis WebGIS untuk Desa Kecitran, Kecamatan Purwareja Klampok, Kabupaten Banjarnegara.">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <style>
+            :root {
+                --primary-color: #0F2C59;
+                --secondary-color: #059669;
+                --accent-color: #F59E0B;
+                --light-bg: #F8FAFC;
+                --text-dark: #1E293B;
+                --text-light: #64748B;
+            }
+            *, *::before, *::after { box-sizing: border-box; }
+            html { scroll-behavior: smooth; overflow-y: auto !important; height: auto; }
+            body {
+                margin: 0;
+                font-family: 'Space Grotesk', sans-serif;
+                line-height: 1.6;
+                color: var(--text-dark);
+                background: var(--light-bg);
+                overflow-y: auto !important;
+                height: auto;
+            }
+            
+            /* Header */
+            header {
+                background: linear-gradient(135deg, var(--primary-color) 0%, #1a4080 100%);
+                color: #fff;
+                padding: 0 2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 4px 20px rgba(15, 44, 89, 0.15);
+            }
+            .nav-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 1400px;
+                margin: 0 auto;
+                height: 70px;
+            }
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 600;
+                font-size: 1.1rem;
+            }
+            .brand img {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+            .menu-toggle { display: none; font-size: 1.5rem; background: none; color: #fff; border: none; cursor: pointer; }
+            .menu { display: flex; gap: 8px; }
+            .menu a {
+                color: rgba(255,255,255,0.85);
+                text-decoration: none;
+                font-weight: 500;
+                padding: 8px 16px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+            .menu a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+            
+            @media (max-width: 768px) {
+                .menu-toggle { display: block; }
+                .menu { 
+                    display: none; 
+                    flex-direction: column; 
+                    position: absolute; 
+                    top: 70px; 
+                    left: 0; 
+                    right: 0;
+                    background: var(--primary-color);
+                    padding: 1rem;
+                }
+                .menu.show { display: flex; }
+            }
+
+            /* Page Title */
+            .page-title {
+                background: linear-gradient(135deg, var(--primary-color) 0%, #1a4080 100%);
+                color: #fff;
+                padding: 2rem;
+                text-align: center;
+            }
+            .page-title h1 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: 700;
+            }
+            .page-title p {
+                margin: 0.5rem 0 0;
+                opacity: 0.9;
+                font-size: 1rem;
+            }
+
+            /* Map Container */
+            .map-container {
+                padding: 1.5rem;
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+            .map-wrap {
+                position: relative;
+                background: #fff;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            #map {
+                width: 100%;
+                height: calc(100vh - 200px);
+                min-height: 500px;
+            }
+            
+            /* Map Overlay Panel */
+            .map-overlay {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+            }
+            .layer-drawer {
+                background: rgba(255,255,255,0.98);
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                min-width: 280px;
+                max-width: 320px;
+                transition: all 0.3s ease;
+            }
+            .layer-drawer.collapsed .drawer-body { display: none; }
+            .drawer-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 16px;
+                border-bottom: 1px solid #e2e8f0;
+                cursor: pointer;
+            }
+            .drawer-title { font-weight: 600; color: var(--primary-color); margin: 0; font-size: 0.95rem; }
+            .drawer-sub { font-size: 0.75rem; color: var(--text-light); margin: 0; }
+            .drawer-toggle {
+                background: var(--primary-color);
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 10px;
+                cursor: pointer;
+                font-size: 1rem;
+            }
+            .drawer-body { padding: 12px 16px; max-height: 60vh; overflow-y: auto; }
+            .layer-section { margin-bottom: 12px; }
+            .layer-section-title { font-size: 0.75rem; color: var(--text-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+            .layer-toggle {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 0;
+                cursor: pointer;
+                font-size: 0.85rem;
+            }
+            .layer-toggle input { width: 16px; height: 16px; accent-color: var(--secondary-color); }
+            .layer-toggle .badge {
+                margin-left: auto;
+                font-size: 0.65rem;
+                background: var(--secondary-color);
+                color: #fff;
+                padding: 2px 6px;
+                border-radius: 20px;
+            }
+
+            /* Search Box */
+            .search-box {
+                margin-bottom: 12px;
+            }
+            .search-box input {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-family: inherit;
+                font-size: 0.9rem;
+            }
+            .search-box input:focus {
+                outline: none;
+                border-color: var(--secondary-color);
+                box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+            }
+            .search-results {
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 8px;
+            }
+            .search-results button {
+                width: 100%;
+                text-align: left;
+                padding: 8px 12px;
+                background: transparent;
+                border: none;
+                border-bottom: 1px solid #f1f5f9;
+                cursor: pointer;
+                font-size: 0.85rem;
+            }
+            .search-results button:hover {
+                background: rgba(5, 150, 105, 0.08);
+            }
+            
+            /* Instruction Box */
+            .instruction-box {
+                background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+                border-left: 4px solid var(--secondary-color);
+                padding: 1rem 1.5rem;
+                margin-bottom: 1.5rem;
+                border-radius: 0 12px 12px 0;
+            }
+            .instruction-box h3 {
+                color: var(--secondary-color);
+                margin: 0 0 0.5rem;
+                font-size: 1rem;
+            }
+            .instruction-box p {
+                margin: 0;
+                color: var(--text-light);
+                font-size: 0.9rem;
+            }
+
+            /* Footer */
+            footer {
+                background: var(--primary-color);
+                color: rgba(255,255,255,0.8);
+                text-align: center;
+                padding: 1.5rem;
+                font-size: 0.85rem;
+            }
+
+            /* Popup Styling */
+            .leaflet-popup-content-wrapper {
+                border-radius: 12px !important;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+            }
+            .leaflet-popup-content {
+                margin: 12px 16px !important;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="nav-bar">
+                <div class="brand">
+                    <img src="images/Banjarnegara.png" alt="Logo Kabupaten Banjarnegara">
+                    <span>Geoportal Desa Kecitran</span>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+                <nav class="menu" aria-label="Navigasi utama">
+                    <a href="../index.html">🏠 Beranda</a>
+                    <a href="../kecamatan/peta.html">🗺️ Peta Kecamatan</a>
+                    <a href="peta.html" style="background: rgba(255,255,255,0.15); color: #fff;">🏘️ Peta Desa</a>
+                </nav>
+            </div>
+        </header>
+
+        <section class="page-title">
+            <h1>🗺️ Peta Interaktif Desa Kecitran</h1>
+            <p>Visualisasi spasial wilayah desa dengan data RT/RW, infrastruktur, dan fasilitas publik</p>
+        </section>
+
+        <main class="map-container">
+            <div class="instruction-box">
+                <h3>📌 Petunjuk Penggunaan</h3>
+                <p>Gunakan fitur <strong>Layer Control</strong> (panel kanan) untuk menyaring informasi dan <strong>Pencarian</strong> untuk menemukan lokasi spesifik. Klik pada objek untuk melihat detail informasi.</p>
+            </div>
+
+            <div class="map-wrap">
+                <div id="map"></div>
+                <aside class="map-overlay">
+                    <div class="layer-drawer collapsed" id="layerDrawer">
+                        <div class="drawer-header">
+                            <div>
+                                <p class="drawer-title">Layer & Pencarian</p>
+                                <p class="drawer-sub">Toggle layer & cari fitur</p>
+                            </div>
+                            <button class="drawer-toggle" id="drawerToggle" aria-label="Tampilkan panel">☰</button>
+                        </div>
+
+                        <div class="drawer-body">
+                            <div class="search-box">
+                                <input id="featureSearch" type="search" placeholder="Cari RT/RW, jalan, landmark..." autocomplete="off">
+                                <div class="search-results" id="searchResults"></div>
+                            </div>
+
+                            <div class="layer-section">
+                                <p class="layer-section-title">Basemap</p>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="basemap" checked disabled>
+                                    <span>Google Satellite</span>
+                                    <span class="badge">Aktif</span>
+                                </label>
+                            </div>
+
+                            <div class="layer-section">
+                                <p class="layer-section-title">Batas Administrasi</p>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="desa" checked>
+                                    <span>Batas Desa Kecitran</span>
+                                </label>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="rw" checked>
+                                    <span>Batas RW</span>
+                                </label>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="rtRw" checked>
+                                    <span>RT/RW</span>
+                                </label>
+                            </div>
+
+                            <div class="layer-section">
+                                <p class="layer-section-title">Infrastruktur</p>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="jalan" checked>
+                                    <span>Jalan Desa</span>
+                                </label>
+                            </div>
+
+                            <div class="layer-section">
+                                <p class="layer-section-title">Fasilitas</p>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="landmark" checked>
+                                    <span>Landmark & Fasilitas</span>
+                                </label>
+                            </div>
+
+                            <div class="layer-section">
+                                <p class="layer-section-title">Lainnya</p>
+                                <label class="layer-toggle">
+                                    <input type="checkbox" data-layer-key="rumahSaya">
+                                    <span>Posisi Rumah Pengembang</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+
+        <footer>
+            © 2025 Sistem Informasi Geografis Desa Kecitran. Dikembangkan oleh Sulthon FN (Universitas Amikom Purwokerto). Dibuat menggunakan QGIS &amp; Leaflet JS.
+        </footer>
+
+        <script>
+            // Menu toggle
+            const toggle = document.querySelector('.menu-toggle');
+            const menu = document.querySelector('.menu');
+            if (toggle && menu) {
+                toggle.addEventListener('click', () => menu.classList.toggle('show'));
+            }
+
+            // Layer drawer toggle
+            const drawerToggle = document.getElementById('drawerToggle');
+            const layerDrawer = document.getElementById('layerDrawer');
+            if (drawerToggle && layerDrawer) {
+                drawerToggle.addEventListener('click', () => {
+                    layerDrawer.classList.toggle('collapsed');
+                });
+            }
+        </script>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <!-- Data files -->
+        <script src="data/batasdesakecitran_1.js"></script>
+        <script src="data/BatasRW_2.js"></script>
+        <script src="data/rt_rw_3.js"></script>
+        <script src="data/JalanDesaKecitran_4.js"></script>
+        <script src="data/LandmarkadminitratifsekolahfaskesTPU_5.js"></script>
+        <script src="data/PosisiRumahSaya_6.js"></script>
+        <script>
+        // ========== Map Initialization ==========
+        var map = L.map('map', {
+            zoomControl: false, 
+            maxZoom: 28, 
+            minZoom: 1
+        }).setView([-7.4775, 109.4448], 15);
+
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        
+        // Popup helper functions
+        function removeEmptyRowsFromPopupContent(content, feature) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var rows = tempDiv.querySelectorAll('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var td = rows[i].querySelector('td.visible-with-data');
+                var key = td ? td.id : '';
+                if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                    rows[i].parentNode.removeChild(rows[i]);
+                }
+            }
+            return tempDiv.innerHTML;
+        }
+
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() { popup.update(); }, 10);
+                }
+            }
+        }
+
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+
+        var bounds_group = new L.featureGroup([]);
+
+        // ========== Basemap Layer ==========
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        map.addLayer(layer_GoogleSatellite_0);
+
+        // ========== Hover Style ==========
+        var hoverStyle = {
+            weight: 5,
+            color: '#F59E0B',
+            opacity: 1,
+            fillOpacity: 0.4,
+            fillColor: '#F59E0B'
+        };
+
+        var originalStyles = {};
+
+        // ========== Batas Desa Kecitran ==========
+        map.createPane('pane_desa');
+        map.getPane('pane_desa').style.zIndex = 401;
+        
+        var layer_desa = new L.geoJson(json_batasdesakecitran_1, {
+            pane: 'pane_desa',
+            style: function() {
+                return {
+                    color: '#059669',
+                    weight: 4,
+                    fillOpacity: 0.1,
+                    fillColor: '#059669'
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                    <tr>\
+                        <th style="padding: 8px; background: #0F2C59; color: white;">Nama Desa</th>\
+                        <td style="padding: 8px; font-weight: 600;">' + (feature.properties['Nama'] || 'Kecitran') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Luas</th>\
+                        <td style="padding: 8px;">' + (feature.properties['luas'] || '± 241 Ha') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Penduduk</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml pend'] || '-') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Dusun</th>\
+                        <td style="padding: 8px;">' + (feature.properties['jml dusun'] || '3') + '</td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
+                
+                layer.on('mouseover', function(e) {
+                    originalStyles[L.stamp(e.target)] = {
+                        weight: e.target.options.weight,
+                        color: e.target.options.color,
+                        fillOpacity: e.target.options.fillOpacity,
+                        fillColor: e.target.options.fillColor
+                    };
+                    e.target.setStyle(hoverStyle);
+                });
+                layer.on('mouseout', function(e) {
+                    var key = L.stamp(e.target);
+                    if (originalStyles[key]) {
+                        e.target.setStyle(originalStyles[key]);
+                        delete originalStyles[key];
+                    }
+                });
+            }
+        });
+        map.addLayer(layer_desa);
+        bounds_group.addLayer(layer_desa);
+
+        // ========== Batas RW ==========
+        map.createPane('pane_rw');
+        map.getPane('pane_rw').style.zIndex = 402;
+        
+        var layer_rw = new L.geoJson(json_BatasRW_2, {
+            pane: 'pane_rw',
+            style: function() {
+                return {
+                    color: '#FFEB3B',
+                    weight: 2,
+                    fillOpacity: 0.05,
+                    fillColor: '#FFEB3B',
+                    dashArray: '5,5'
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                    <tr>\
+                        <th style="padding: 6px 10px; background: #0F2C59; color: white;">RW</th>\
+                        <td style="padding: 6px 10px;">' + (feature.properties['RW'] || feature.properties['rw'] || '-') + '</td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
+            }
+        });
+        map.addLayer(layer_rw);
+
+        // ========== RT/RW ==========
+        map.createPane('pane_rtRw');
+        map.getPane('pane_rtRw').style.zIndex = 403;
+        
+        var layer_rtRw = new L.geoJson(json_rt_rw_3, {
+            pane: 'pane_rtRw',
+            style: function(feature) {
+                var colors = ['#4CAF50', '#2196F3', '#9C27B0', '#FF9800', '#00BCD4', '#E91E63'];
+                var rw = feature.properties['RW'] || feature.properties['rw'] || 1;
+                return {
+                    color: colors[(rw - 1) % colors.length],
+                    weight: 2,
+                    fillOpacity: 0.15,
+                    fillColor: colors[(rw - 1) % colors.length]
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                    <tr>\
+                        <th style="padding: 6px 10px; background: #0F2C59; color: white;">RT</th>\
+                        <td style="padding: 6px 10px;">' + (feature.properties['RT'] || feature.properties['rt'] || '-') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th style="padding: 6px 10px; background: #f1f5f9;">RW</th>\
+                        <td style="padding: 6px 10px;">' + (feature.properties['RW'] || feature.properties['rw'] || '-') + '</td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
+                
+                layer.on('mouseover', function(e) {
+                    originalStyles[L.stamp(e.target)] = {
+                        weight: e.target.options.weight,
+                        fillOpacity: e.target.options.fillOpacity
+                    };
+                    e.target.setStyle({ weight: 4, fillOpacity: 0.4 });
+                });
+                layer.on('mouseout', function(e) {
+                    var key = L.stamp(e.target);
+                    if (originalStyles[key]) {
+                        e.target.setStyle(originalStyles[key]);
+                        delete originalStyles[key];
+                    }
+                });
+            }
+        });
+        map.addLayer(layer_rtRw);
+
+        // ========== Jalan Desa ==========
+        map.createPane('pane_jalan');
+        map.getPane('pane_jalan').style.zIndex = 410;
+        
+        var layer_jalan = new L.geoJson(json_JalanDesaKecitran_4, {
+            pane: 'pane_jalan',
+            style: function() {
+                return {
+                    color: '#FFC107',
+                    weight: 3,
+                    opacity: 0.9
+                };
+            },
+            onEachFeature: function(feature, layer) {
+                if (feature.properties['nama'] || feature.properties['Nama']) {
+                    layer.bindPopup('<strong>' + (feature.properties['nama'] || feature.properties['Nama']) + '</strong>');
+                }
+            }
+        });
+        map.addLayer(layer_jalan);
+
+        // ========== Landmark & Fasilitas ==========
+        map.createPane('pane_landmark');
+        map.getPane('pane_landmark').style.zIndex = 500;
+        
+        var layer_landmark = new L.geoJson(json_LandmarkadminitratifsekolahfaskesTPU_5, {
+            pane: 'pane_landmark',
+            pointToLayer: function(feature, latlng) {
+                var jenis = (feature.properties['Jenis'] || feature.properties['jenis'] || '').toLowerCase();
+                var icon = '📍';
+                var color = '#607D8B';
+                
+                if (jenis.includes('sekolah') || jenis.includes('sd') || jenis.includes('smp') || jenis.includes('sma')) {
+                    icon = '🏫'; color = '#4CAF50';
+                } else if (jenis.includes('masjid') || jenis.includes('mushola') || jenis.includes('gereja')) {
+                    icon = '🕌'; color = '#9C27B0';
+                } else if (jenis.includes('kantor') || jenis.includes('balai')) {
+                    icon = '🏢'; color = '#2196F3';
+                } else if (jenis.includes('tpu') || jenis.includes('makam')) {
+                    icon = '⚰️'; color = '#607D8B';
+                } else if (jenis.includes('puskesmas') || jenis.includes('klinik') || jenis.includes('rs')) {
+                    icon = '🏥'; color = '#F44336';
+                }
+                
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        html: '<div style="background:' + color + ';color:#fff;padding:4px;border-radius:50%;font-size:14px;text-align:center;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">' + icon + '</div>',
+                        className: 'custom-marker',
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    })
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">';
+                if (feature.properties['Nama'] || feature.properties['nama']) {
+                    popupContent += '<tr><th style="padding: 6px 10px; background: #0F2C59; color: white;">Nama</th><td style="padding: 6px 10px; font-weight: 600;">' + (feature.properties['Nama'] || feature.properties['nama']) + '</td></tr>';
+                }
+                if (feature.properties['Jenis'] || feature.properties['jenis']) {
+                    popupContent += '<tr><th style="padding: 6px 10px; background: #f1f5f9;">Jenis</th><td style="padding: 6px 10px;">' + (feature.properties['Jenis'] || feature.properties['jenis']) + '</td></tr>';
+                }
+                if (feature.properties['Alamat'] || feature.properties['alamat']) {
+                    popupContent += '<tr><th style="padding: 6px 10px; background: #f1f5f9;">Alamat</th><td style="padding: 6px 10px;">' + (feature.properties['Alamat'] || feature.properties['alamat']) + '</td></tr>';
+                }
+                popupContent += '</table>';
+                layer.bindPopup(popupContent);
+            }
+        });
+        map.addLayer(layer_landmark);
+
+        // ========== Posisi Rumah Saya ==========
+        map.createPane('pane_rumahSaya');
+        map.getPane('pane_rumahSaya').style.zIndex = 600;
+        
+        var layer_rumahSaya = new L.geoJson(json_PosisiRumahSaya_6, {
+            pane: 'pane_rumahSaya',
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        html: '<div style="background:#F59E0B;color:#fff;padding:6px;border-radius:50%;font-size:16px;text-align:center;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏠</div>',
+                        className: 'custom-marker',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    })
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindPopup('<strong>🏠 Rumah Pengembang</strong><br>Sulthon Fadhlun Nafi');
+            }
+        });
+
+        // ========== Layer Toggle Functionality ==========
+        var layers = {
+            'desa': layer_desa,
+            'rw': layer_rw,
+            'rtRw': layer_rtRw,
+            'jalan': layer_jalan,
+            'landmark': layer_landmark,
+            'rumahSaya': layer_rumahSaya
+        };
+
+        var layerToggles = document.querySelectorAll('[data-layer-key]');
+        layerToggles.forEach(function(toggle) {
+            toggle.addEventListener('change', function() {
+                var layerKey = this.getAttribute('data-layer-key');
+                if (layers[layerKey]) {
+                    if (this.checked) {
+                        map.addLayer(layers[layerKey]);
+                    } else {
+                        map.removeLayer(layers[layerKey]);
+                    }
+                }
+            });
+        });
+
+        // ========== Search Functionality ==========
+        var searchInput = document.getElementById('featureSearch');
+        var searchResults = document.getElementById('searchResults');
+        var searchableFeatures = [];
+
+        // Collect searchable features
+        layer_rtRw.eachLayer(function(layer) {
+            if (layer.feature) {
+                searchableFeatures.push({
+                    name: 'RT ' + (layer.feature.properties['RT'] || layer.feature.properties['rt'] || '?') + ' / RW ' + (layer.feature.properties['RW'] || layer.feature.properties['rw'] || '?'),
+                    layer: layer,
+                    bounds: layer.getBounds()
+                });
+            }
+        });
+
+        layer_landmark.eachLayer(function(layer) {
+            if (layer.feature && (layer.feature.properties['Nama'] || layer.feature.properties['nama'])) {
+                searchableFeatures.push({
+                    name: layer.feature.properties['Nama'] || layer.feature.properties['nama'],
+                    layer: layer,
+                    latlng: layer.getLatLng()
+                });
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
+            var query = this.value.toLowerCase().trim();
+            searchResults.innerHTML = '';
+            
+            if (query.length < 2) return;
+            
+            var matches = searchableFeatures.filter(function(f) {
+                return f.name.toLowerCase().includes(query);
+            }).slice(0, 10);
+            
+            matches.forEach(function(match) {
+                var btn = document.createElement('button');
+                btn.textContent = match.name;
+                btn.addEventListener('click', function() {
+                    if (match.bounds) {
+                        map.fitBounds(match.bounds, { padding: [50, 50] });
+                    } else if (match.latlng) {
+                        map.setView(match.latlng, 18);
+                    }
+                    match.layer.openPopup();
+                    searchInput.value = '';
+                    searchResults.innerHTML = '';
+                });
+                searchResults.appendChild(btn);
+            });
+        });
+
+        // Fit map to desa bounds
+        map.fitBounds(layer_desa.getBounds(), {
+            padding: [40, 40]
+        });
+        </script>        
+    </body>
+</html>
