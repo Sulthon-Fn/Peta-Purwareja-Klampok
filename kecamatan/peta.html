@@ -312,35 +312,35 @@
                             <div class="layer-section">
                                 <p class="layer-section-title">Fasilitas</p>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="sekolah">
+                                    <input type="checkbox" data-layer-key="sekolah" checked>
                                     <span>Sekolah</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="keagamaan">
+                                    <input type="checkbox" data-layer-key="keagamaan" checked>
                                     <span>Fasilitas Keagamaan</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="kantor">
+                                    <input type="checkbox" data-layer-key="kantor" checked>
                                     <span>Kantor</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="toko">
+                                    <input type="checkbox" data-layer-key="toko" checked>
                                     <span>Toko</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="tempatMakan">
+                                    <input type="checkbox" data-layer-key="tempatMakan" checked>
                                     <span>Tempat Makan</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="spbu">
+                                    <input type="checkbox" data-layer-key="spbu" checked>
                                     <span>SPBU</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="lapangan">
+                                    <input type="checkbox" data-layer-key="lapangan" checked>
                                     <span>Lapangan</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="pemakaman">
+                                    <input type="checkbox" data-layer-key="pemakaman" checked>
                                     <span>Pemakaman</span>
                                 </label>
                             </div>
@@ -742,32 +742,40 @@
             });
         }
 
-        // Sekolah
-        var layer_sekolah = createPointLayer(json_Sekolah_22, 'pane_sekolah', '<div style="background:#4CAF50;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🏫</div>', ['nama', 'jenis', 'alamat']);
+        // Sekolah - Icon transparan dengan shadow
+        var layer_sekolah = createPointLayer(json_Sekolah_22, 'pane_sekolah', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow1" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(76, 175, 80, 0.85)" filter="url(#shadow1)"/><text x="18" y="23" text-anchor="middle" font-size="14">🏫</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_sekolah);
 
-        // Fasilitas Keagamaan
-        var layer_keagamaan = createPointLayer(json_FasilitasKeagamaan_27, 'pane_keagamaan', '<div style="background:#9C27B0;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🕌</div>', ['nama', 'jenis', 'alamat']);
+        // Fasilitas Keagamaan - Icon transparan dengan shadow
+        var layer_keagamaan = createPointLayer(json_FasilitasKeagamaan_27, 'pane_keagamaan', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(156, 39, 176, 0.85)" filter="url(#shadow2)"/><text x="18" y="23" text-anchor="middle" font-size="14">🕌</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_keagamaan);
 
-        // Kantor
-        var layer_kantor = createPointLayer(json_Kantor_26, 'pane_kantor', '<div style="background:#2196F3;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🏢</div>', ['nama', 'jenis', 'alamat']);
+        // Kantor - Icon transparan dengan shadow
+        var layer_kantor = createPointLayer(json_Kantor_26, 'pane_kantor', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow3" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(33, 150, 243, 0.85)" filter="url(#shadow3)"/><text x="18" y="23" text-anchor="middle" font-size="14">🏢</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_kantor);
 
-        // Toko
-        var layer_toko = createPointLayer(json_Toko_19, 'pane_toko', '<div style="background:#FF9800;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🏪</div>', ['nama', 'jenis', 'alamat']);
+        // Toko - Icon transparan dengan shadow
+        var layer_toko = createPointLayer(json_Toko_19, 'pane_toko', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow4" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(255, 152, 0, 0.85)" filter="url(#shadow4)"/><text x="18" y="23" text-anchor="middle" font-size="14">🏪</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_toko);
 
-        // Tempat Makan
-        var layer_tempatMakan = createPointLayer(json_TempatMakan_20, 'pane_tempatMakan', '<div style="background:#E91E63;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🍽️</div>', ['nama', 'jenis', 'alamat']);
+        // Tempat Makan - Icon transparan dengan shadow
+        var layer_tempatMakan = createPointLayer(json_TempatMakan_20, 'pane_tempatMakan', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow5" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(233, 30, 99, 0.85)" filter="url(#shadow5)"/><text x="18" y="23" text-anchor="middle" font-size="14">🍽️</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_tempatMakan);
 
-        // SPBU
-        var layer_spbu = createPointLayer(json_SPBU_21, 'pane_spbu', '<div style="background:#F44336;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">⛽</div>', ['nama', 'alamat']);
+        // SPBU - Icon transparan dengan shadow
+        var layer_spbu = createPointLayer(json_SPBU_21, 'pane_spbu', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow6" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(244, 67, 54, 0.85)" filter="url(#shadow6)"/><text x="18" y="23" text-anchor="middle" font-size="14">⛽</text></svg>', ['nama', 'alamat']);
+        map.addLayer(layer_spbu);
 
-        // Lapangan
-        var layer_lapangan = createPointLayer(json_Lapangan_25, 'pane_lapangan', '<div style="background:#00BCD4;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🏟️</div>', ['nama', 'jenis', 'alamat']);
+        // Lapangan - Icon transparan dengan shadow
+        var layer_lapangan = createPointLayer(json_Lapangan_25, 'pane_lapangan', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow7" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(0, 188, 212, 0.85)" filter="url(#shadow7)"/><text x="18" y="23" text-anchor="middle" font-size="14">🏟️</text></svg>', ['nama', 'jenis', 'alamat']);
+        map.addLayer(layer_lapangan);
 
-        // Pemakaman
-        var layer_pemakaman = createPointLayer(json_Pemakaman_24, 'pane_pemakaman', '<div style="background:#607D8B;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">⚰️</div>', ['nama', 'alamat']);
+        // Pemakaman - Icon transparan dengan shadow
+        var layer_pemakaman = createPointLayer(json_Pemakaman_24, 'pane_pemakaman', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow8" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(96, 125, 139, 0.85)" filter="url(#shadow8)"/><text x="18" y="23" text-anchor="middle" font-size="14">⚰️</text></svg>', ['nama', 'alamat']);
+        map.addLayer(layer_pemakaman);
 
-        // Rumah Saya
-        var layer_rumahSaya = createPointLayer(json_RumahSaya_23, 'pane_rumahSaya', '<div style="background:#F59E0B;color:#fff;padding:4px;border-radius:50%;font-size:12px;text-align:center;">🏠</div>', ['nama', 'keterangan']);
+        // Rumah Saya - Icon transparan dengan shadow
+        var layer_rumahSaya = createPointLayer(json_RumahSaya_23, 'pane_rumahSaya', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadow9" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(245, 158, 11, 0.85)" filter="url(#shadow9)"/><text x="18" y="23" text-anchor="middle" font-size="14">🏠</text></svg>', ['nama', 'keterangan']);
 
         // ========== Layer Toggle Functionality ==========
         var layers = {

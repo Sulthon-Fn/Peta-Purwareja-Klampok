@@ -13,7 +13,6 @@
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="css/leaflet-search.css">
         <style>
             :root {
                 --primary-color: #0F2C59;
@@ -95,7 +94,7 @@
 
             /* Page Title */
             .page-title {
-                background: linear-gradient(135deg, var(--primary-color) 0%, #1a4080 100%);
+                background: linear-gradient(135deg, var(--secondary-color) 0%, #047857 100%);
                 color: #fff;
                 padding: 2rem;
                 text-align: center;
@@ -157,7 +156,7 @@
             .drawer-title { font-weight: 600; color: var(--primary-color); margin: 0; font-size: 0.95rem; }
             .drawer-sub { font-size: 0.75rem; color: var(--text-light); margin: 0; }
             .drawer-toggle {
-                background: var(--primary-color);
+                background: var(--secondary-color);
                 color: #fff;
                 border: none;
                 border-radius: 6px;
@@ -185,41 +184,11 @@
                 padding: 2px 6px;
                 border-radius: 20px;
             }
-
-            /* Search Box */
-            .search-box {
-                margin-bottom: 12px;
-            }
-            .search-box input {
-                width: 100%;
-                padding: 10px 12px;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                font-family: inherit;
-                font-size: 0.9rem;
-            }
-            .search-box input:focus {
-                outline: none;
-                border-color: var(--secondary-color);
-                box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-            }
-            .search-results {
-                max-height: 200px;
-                overflow-y: auto;
-                margin-top: 8px;
-            }
-            .search-results button {
-                width: 100%;
-                text-align: left;
-                padding: 8px 12px;
-                background: transparent;
-                border: none;
-                border-bottom: 1px solid #f1f5f9;
-                cursor: pointer;
-                font-size: 0.85rem;
-            }
-            .search-results button:hover {
-                background: rgba(5, 150, 105, 0.08);
+            .layer-toggle .color-swatch {
+                width: 14px;
+                height: 14px;
+                border-radius: 3px;
+                border: 1px solid rgba(0,0,0,0.15);
             }
             
             /* Instruction Box */
@@ -250,13 +219,41 @@
                 font-size: 0.85rem;
             }
 
+            /* Label Styling */
+            .village-label, .rt-label, .landmark-label {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
             /* Popup Styling */
             .leaflet-popup-content-wrapper {
                 border-radius: 12px !important;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+                font-family: 'Space Grotesk', sans-serif !important;
             }
             .leaflet-popup-content {
                 margin: 12px 16px !important;
+            }
+            .leaflet-popup-content table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            .leaflet-popup-content th,
+            .leaflet-popup-content td {
+                padding: 8px 12px;
+                text-align: left;
+            }
+            .leaflet-popup-content th {
+                background: #f1f5f9;
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            /* Custom marker styling */
+            .custom-marker {
+                background: transparent;
+                border: none;
             }
         </style>
     </head>
@@ -271,20 +268,20 @@
                 <nav class="menu" aria-label="Navigasi utama">
                     <a href="../index.html">🏠 Beranda</a>
                     <a href="../kecamatan/peta.html">🗺️ Peta Kecamatan</a>
-                    <a href="peta.html" style="background: rgba(255,255,255,0.15); color: #fff;">🏘️ Peta Desa</a>
+                    <a href="peta.html" style="background: rgba(255,255,255,0.15); color: #fff;">🏘️ Peta Desa Kecitran</a>
                 </nav>
             </div>
         </header>
 
         <section class="page-title">
-            <h1>🗺️ Peta Interaktif Desa Kecitran</h1>
-            <p>Visualisasi spasial wilayah desa dengan data RT/RW, infrastruktur, dan fasilitas publik</p>
+            <h1>🏘️ Peta Interaktif Desa Kecitran</h1>
+            <p>Visualisasi spasial wilayah desa dengan data RT/RW dan fasilitas umum</p>
         </section>
 
         <main class="map-container">
             <div class="instruction-box">
                 <h3>📌 Petunjuk Penggunaan</h3>
-                <p>Gunakan fitur <strong>Layer Control</strong> (panel kanan) untuk menyaring informasi dan <strong>Pencarian</strong> untuk menemukan lokasi spesifik. Klik pada objek untuk melihat detail informasi.</p>
+                <p>Gunakan fitur <strong>Layer Control</strong> (panel kanan) untuk menyaring informasi. Klik pada area RT/RW untuk melihat detail. Arahkan kursor ke area untuk highlight.</p>
             </div>
 
             <div class="map-wrap">
@@ -293,18 +290,13 @@
                     <div class="layer-drawer collapsed" id="layerDrawer">
                         <div class="drawer-header">
                             <div>
-                                <p class="drawer-title">Layer & Pencarian</p>
-                                <p class="drawer-sub">Toggle layer & cari fitur</p>
+                                <p class="drawer-title">Layer Control</p>
+                                <p class="drawer-sub">Toggle layer peta</p>
                             </div>
                             <button class="drawer-toggle" id="drawerToggle" aria-label="Tampilkan panel">☰</button>
                         </div>
 
                         <div class="drawer-body">
-                            <div class="search-box">
-                                <input id="featureSearch" type="search" placeholder="Cari RT/RW, jalan, landmark..." autocomplete="off">
-                                <div class="search-results" id="searchResults"></div>
-                            </div>
-
                             <div class="layer-section">
                                 <p class="layer-section-title">Basemap</p>
                                 <label class="layer-toggle">
@@ -317,16 +309,16 @@
                             <div class="layer-section">
                                 <p class="layer-section-title">Batas Administrasi</p>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="desa" checked>
+                                    <input type="checkbox" data-layer-key="batasDesa" checked>
                                     <span>Batas Desa Kecitran</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="rw" checked>
+                                    <input type="checkbox" data-layer-key="batasRW" checked>
                                     <span>Batas RW</span>
                                 </label>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="rtRw" checked>
-                                    <span>RT/RW</span>
+                                    <input type="checkbox" data-layer-key="rtRW" checked>
+                                    <span>Batas RT/RW</span>
                                 </label>
                             </div>
 
@@ -349,7 +341,7 @@
                             <div class="layer-section">
                                 <p class="layer-section-title">Lainnya</p>
                                 <label class="layer-toggle">
-                                    <input type="checkbox" data-layer-key="rumahSaya">
+                                    <input type="checkbox" data-layer-key="rumahSaya" checked>
                                     <span>Posisi Rumah Pengembang</span>
                                 </label>
                             </div>
@@ -390,8 +382,6 @@
         <script src="js/rbush.min.js"></script>
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
-        <script src="js/leaflet.photon.js"></script>
-        <script src="js/leaflet-search.js"></script>
         <!-- Data files -->
         <script src="data/batasdesakecitran_1.js"></script>
         <script src="data/BatasRW_2.js"></script>
@@ -402,295 +392,241 @@
         <script>
         // ========== Map Initialization ==========
         var map = L.map('map', {
-            zoomControl: false, 
-            maxZoom: 28, 
-            minZoom: 1
-        }).setView([-7.4775, 109.4448], 15);
+            zoomControl: true,
+            maxZoom: 22,
+            minZoom: 12
+        }).setView([-7.477, 109.445], 16);
 
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
-        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+
+        // ========== Basemap ==========
+        map.createPane('pane_basemap');
+        map.getPane('pane_basemap').style.zIndex = 400;
         
-        // Popup helper functions
-        function removeEmptyRowsFromPopupContent(content, feature) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            var rows = tempDiv.querySelectorAll('tr');
-            for (var i = 0; i < rows.length; i++) {
-                var td = rows[i].querySelector('td.visible-with-data');
-                var key = td ? td.id : '';
-                if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                    rows[i].parentNode.removeChild(rows[i]);
-                }
-            }
-            return tempDiv.innerHTML;
-        }
-
-        function addClassToPopupIfMedia(content, popup) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            var imgTd = tempDiv.querySelector('td img');
-            if (imgTd) {
-                var src = imgTd.getAttribute('src');
-                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
-                    popup._contentNode.classList.add('media');
-                    setTimeout(function() { popup.update(); }, 10);
-                }
-            }
-        }
-
-        var zoomControl = L.control.zoom({
-            position: 'topleft'
-        }).addTo(map);
-
-        var bounds_group = new L.featureGroup([]);
-
-        // ========== Basemap Layer ==========
-        map.createPane('pane_GoogleSatellite_0');
-        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
-        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-            pane: 'pane_GoogleSatellite_0',
+        var layer_basemap = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_basemap',
             opacity: 1.0,
-            attribution: '',
+            attribution: 'Google Satellite',
             minZoom: 1,
-            maxZoom: 28,
+            maxZoom: 22
         });
-        map.addLayer(layer_GoogleSatellite_0);
-
-        // ========== Hover Style ==========
-        var hoverStyle = {
-            weight: 5,
-            color: '#F59E0B',
-            opacity: 1,
-            fillOpacity: 0.4,
-            fillColor: '#F59E0B'
-        };
-
-        var originalStyles = {};
+        map.addLayer(layer_basemap);
 
         // ========== Batas Desa Kecitran ==========
-        map.createPane('pane_desa');
-        map.getPane('pane_desa').style.zIndex = 401;
-        
-        var layer_desa = new L.geoJson(json_batasdesakecitran_1, {
-            pane: 'pane_desa',
+        map.createPane('pane_batasDesa');
+        map.getPane('pane_batasDesa').style.zIndex = 401;
+
+        var layer_batasDesa = new L.geoJson(json_batasdesakecitran_1, {
+            pane: 'pane_batasDesa',
             style: function() {
                 return {
-                    color: '#059669',
-                    weight: 4,
-                    fillOpacity: 0.1,
-                    fillColor: '#059669'
+                    color: '#388E3C',
+                    weight: 3,
+                    fillOpacity: 0.15,
+                    fillColor: '#4CAF50'
                 };
             },
             onEachFeature: function(feature, layer) {
-                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                var popupContent = '<table>\
                     <tr>\
-                        <th style="padding: 8px; background: #0F2C59; color: white;">Nama Desa</th>\
-                        <td style="padding: 8px; font-weight: 600;">' + (feature.properties['Nama'] || 'Kecitran') + '</td>\
+                        <th style="padding: 10px; background: #059669; color: white; border-radius: 6px 6px 0 0;">Desa Kecitran</th>\
                     </tr>\
                     <tr>\
-                        <th style="padding: 8px; background: #f1f5f9;">Luas</th>\
-                        <td style="padding: 8px;">' + (feature.properties['luas'] || '± 241 Ha') + '</td>\
+                        <td style="padding: 8px;"><strong>Nama:</strong> ' + (feature.properties['Nama'] || 'Kecitran') + '</td>\
                     </tr>\
                     <tr>\
-                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Penduduk</th>\
-                        <td style="padding: 8px;">' + (feature.properties['jml pend'] || '-') + '</td>\
+                        <td style="padding: 8px;"><strong>Luas:</strong> ' + (feature.properties['luas'] || '± 241 Ha') + '</td>\
                     </tr>\
                     <tr>\
-                        <th style="padding: 8px; background: #f1f5f9;">Jumlah Dusun</th>\
-                        <td style="padding: 8px;">' + (feature.properties['jml dusun'] || '3') + '</td>\
+                        <td style="padding: 8px;"><strong>Jumlah Penduduk:</strong> ' + (feature.properties['jml pend'] || '± 3.500 Jiwa') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td style="padding: 8px;"><strong>Jumlah Dusun:</strong> ' + (feature.properties['jml dusun'] || '3 Dusun') + '</td>\
                     </tr>\
                 </table>';
                 layer.bindPopup(popupContent);
                 
+                // Hover effect
                 layer.on('mouseover', function(e) {
-                    originalStyles[L.stamp(e.target)] = {
-                        weight: e.target.options.weight,
-                        color: e.target.options.color,
-                        fillOpacity: e.target.options.fillOpacity,
-                        fillColor: e.target.options.fillColor
-                    };
-                    e.target.setStyle(hoverStyle);
+                    e.target.setStyle({
+                        weight: 5,
+                        color: '#F59E0B',
+                        fillOpacity: 0.25
+                    });
                 });
                 layer.on('mouseout', function(e) {
-                    var key = L.stamp(e.target);
-                    if (originalStyles[key]) {
-                        e.target.setStyle(originalStyles[key]);
-                        delete originalStyles[key];
-                    }
+                    e.target.setStyle({
+                        color: '#388E3C',
+                        weight: 3,
+                        fillOpacity: 0.15
+                    });
                 });
             }
         });
-        map.addLayer(layer_desa);
-        bounds_group.addLayer(layer_desa);
+        map.addLayer(layer_batasDesa);
 
-        // ========== QGIS Style for Batas RW (from original export) ==========
-        function style_BatasRW_2(feature) {
-            var rwValue = String(feature.properties['RW'] || feature.properties['rw'] || '').trim();
-            switch(rwValue) {
-                case 'RW 01': case '01': case '1':
-                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(233,238,133,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(233,238,133,0.3)', interactive: true };
-                case 'RW 02': case '02': case '2':
-                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(221,65,211,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(221,65,211,0.3)', interactive: true };
-                case 'RW 03': case '03': case '3':
-                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(85,74,231,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(85,74,231,0.3)', interactive: true };
-                case 'RW 04': case '04': case '4':
-                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(219,116,108,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(219,116,108,0.3)', interactive: true };
-                case 'RW 5': case 'RW 05': case '05': case '5':
-                    return { pane: 'pane_rw', opacity: 1, color: 'rgba(79,197,203,1.0)', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: 'rgba(79,197,203,0.3)', interactive: true };
-                default:
-                    return { pane: 'pane_rw', opacity: 1, color: '#FFEB3B', weight: 4.0, fill: true, fillOpacity: 0.1, fillColor: '#FFEB3B', interactive: true };
-            }
-        }
+        // ========== Batas RW (Warna berbeda per RW) ==========
+        map.createPane('pane_batasRW');
+        map.getPane('pane_batasRW').style.zIndex = 402;
 
-        // ========== QGIS Style for RT/RW (from original export) ==========
-        function style_rt_rw_3(feature) {
-            var rtRwValue = String(feature.properties['RT/RW'] || feature.properties['rt_rw'] || '').trim();
-            switch(rtRwValue) {
-                case 'RT 01 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(214,25,28,1.0)', interactive: true };
-                case 'RT 01 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(230,42,167,1.0)', interactive: true };
-                case 'RT 01 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(155,89,182,1.0)', interactive: true };
-                case 'RT 01 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(52,152,219,1.0)', interactive: true };
-                case 'RT 01 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(231,61,56,1.0)', interactive: true };
-                case 'RT 02 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(215,164,114,1.0)', interactive: true };
-                case 'RT 02 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(216,229,133,1.0)', interactive: true };
-                case 'RT 02 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(233,136,151,1.0)', interactive: true };
-                case 'RT 02 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(220,82,28,1.0)', interactive: true };
-                case 'RT 03 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(41,217,230,1.0)', interactive: true };
-                case 'RT 03 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(105,232,70,1.0)', interactive: true };
-                case 'RT 03 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(228,108,202,1.0)', interactive: true };
-                case 'RT 03 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(25,38,220,1.0)', interactive: true };
-                case 'RT 03 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(56,226,164,1.0)', interactive: true };
-                case 'RT 04 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(37,219,73,1.0)', interactive: true };
-                case 'RT 04 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(109,172,234,1.0)', interactive: true };
-                case 'RT 04 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(94,27,217,1.0)', interactive: true };
-                case 'RT 04 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(157,233,15,1.0)', interactive: true };
-                case 'RT 04 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(130,31,205,1.0)', interactive: true };
-                case 'RT 05 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(221,124,179,1.0)', interactive: true };
-                case 'RT 05 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(97,134,228,1.0)', interactive: true };
-                case 'RT 05 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(238,226,99,1.0)', interactive: true };
-                case 'RT 05 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(81,53,237,1.0)', interactive: true };
-                case 'RT 05 RW 05': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(205,44,33,1.0)', interactive: true };
-                case 'RT 06 RW 01': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(45,224,197,1.0)', interactive: true };
-                case 'RT 06 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(243,156,18,1.0)', interactive: true };
-                case 'RT 06 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(46,204,113,1.0)', interactive: true };
-                case 'RT 06 RW 04': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(142,68,173,1.0)', interactive: true };
-                case 'RT 07 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(41,128,185,1.0)', interactive: true };
-                case 'RT 07 RW 03': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(231,76,60,1.0)', interactive: true };
-                case 'RT 08 RW 02': return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.8, fillColor: 'rgba(189,195,199,1.0)', interactive: true };
-                default: return { pane: 'pane_rtRw', opacity: 1, color: 'rgba(56,128,54,1.0)', weight: 1.0, fill: true, fillOpacity: 0.6, fillColor: 'rgba(100,100,100,0.6)', interactive: true };
-            }
-        }
+        var rwColors = {
+            'RW 01': { color: '#E9EE85', label: 'RW 01' },
+            'RW 02': { color: '#DD41D3', label: 'RW 02' },
+            'RW 03': { color: '#554AE7', label: 'RW 03' },
+            'RW 04': { color: '#DB746C', label: 'RW 04' },
+            'RW 5': { color: '#4FC5CB', label: 'RW 05' }
+        };
 
-        // ========== Batas RW ==========
-        map.createPane('pane_rw');
-        map.getPane('pane_rw').style.zIndex = 402;
-        
-        var layer_rw = new L.geoJson(json_BatasRW_2, {
-            pane: 'pane_rw',
-            style: style_BatasRW_2,
+        var layer_batasRW = new L.geoJson(json_BatasRW_2, {
+            pane: 'pane_batasRW',
+            style: function(feature) {
+                var rw = feature.properties['RW'];
+                var rwStyle = rwColors[rw] || { color: '#5DE363' };
+                return {
+                    color: rwStyle.color,
+                    weight: 4,
+                    fillOpacity: 0,
+                    opacity: 0.9
+                };
+            },
             onEachFeature: function(feature, layer) {
-                var rwValue = feature.properties['RW'] || feature.properties['rw'] || '-';
-                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                var rw = feature.properties['RW'] || 'Unknown';
+                var popupContent = '<table>\
                     <tr>\
-                        <th style="padding: 6px 10px; background: #0F2C59; color: white;">RW</th>\
-                        <td style="padding: 6px 10px; font-weight: 600;">' + rwValue + '</td>\
+                        <th style="padding: 10px; background: #0F2C59; color: white; border-radius: 6px 6px 0 0;">Batas RW</th>\
+                    </tr>\
+                    <tr>\
+                        <td style="padding: 8px;"><strong>' + rw + '</strong></td>\
                     </tr>\
                 </table>';
                 layer.bindPopup(popupContent);
                 
+                // Hover effect
+                var originalColor = (rwColors[rw] || { color: '#5DE363' }).color;
                 layer.on('mouseover', function(e) {
-                    var currentStyle = style_BatasRW_2(feature);
-                    originalStyles[L.stamp(e.target)] = {
-                        weight: currentStyle.weight,
-                        color: currentStyle.color,
-                        fillOpacity: currentStyle.fillOpacity,
-                        fillColor: currentStyle.fillColor
-                    };
                     e.target.setStyle({
                         weight: 6,
-                        color: '#F59E0B',
-                        fillOpacity: 0.4,
-                        fillColor: '#F59E0B'
+                        color: '#F59E0B'
                     });
                 });
                 layer.on('mouseout', function(e) {
-                    var key = L.stamp(e.target);
-                    if (originalStyles[key]) {
-                        e.target.setStyle(originalStyles[key]);
-                        delete originalStyles[key];
-                    }
+                    e.target.setStyle({
+                        weight: 4,
+                        color: originalColor
+                    });
                 });
             }
         });
-        map.addLayer(layer_rw);
+        map.addLayer(layer_batasRW);
 
-        // ========== RT/RW ==========
-        map.createPane('pane_rtRw');
-        map.getPane('pane_rtRw').style.zIndex = 403;
-        
-        var layer_rtRw = new L.geoJson(json_rt_rw_3, {
-            pane: 'pane_rtRw',
-            style: style_rt_rw_3,
+        // ========== RT/RW (Warna berbeda per RT) ==========
+        map.createPane('pane_rtRW');
+        map.getPane('pane_rtRW').style.zIndex = 403;
+
+        // Warna unik untuk setiap RT/RW (dari QGIS export)
+        var rtColors = {
+            'RT 01 RW 01': '#2BE028',
+            'RT 01 RW 02': '#82D046',
+            'RT 01 RW 03': '#CAA750',
+            'RT 01 RW 04': '#C957C9',
+            'RT 01 RW 05': '#EC80A7',
+            'RT 02 RW 01': '#D7A472',
+            'RT 02 RW 02': '#D8E585',
+            'RT 02 RW 03': '#E98897',
+            'RT 02 RW 04': '#DC521C',
+            'RT 03 RW 01': '#29D9E6',
+            'RT 03 RW 02': '#69E846',
+            'RT 03 RW 03': '#E46CCA',
+            'RT 03 RW 04': '#1926DC',
+            'RT 03 RW 05': '#38E2A4',
+            'RT 04 RW 01': '#25DB49',
+            'RT 04 RW 02': '#6DACEA',
+            'RT 04 RW 03': '#5E1BD9',
+            'RT 04 RW 04': '#9DE90F',
+            'RT 04 RW 05': '#821FCD',
+            'RT 05 RW 01': '#E86F49',
+            'RT 05 RW 02': '#E04D62',
+            'RT 05 RW 03': '#DDB24D',
+            'RT 05 RW 04': '#DD4FB8',
+            'RT 05 RW 05': '#E4BE71',
+            'RT 06 RW 01': '#E74F8E',
+            'RT 06 RW 02': '#DF7A27',
+            'RT 06 RW 05': '#3FCE26'
+        };
+
+        var layer_rtRW = new L.geoJson(json_rt_rw_3, {
+            pane: 'pane_rtRW',
+            style: function(feature) {
+                var rtRw = feature.properties['RT/RW'];
+                var fillColor = rtColors[rtRw] || '#77DD77';
+                return {
+                    color: '#388636',
+                    weight: 1,
+                    fillOpacity: 0.5,
+                    fillColor: fillColor
+                };
+            },
             onEachFeature: function(feature, layer) {
-                var rtRwValue = feature.properties['RT/RW'] || feature.properties['rt_rw'] || '-';
-                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">\
+                var rtRw = feature.properties['RT/RW'] || 'Unknown';
+                var popupContent = '<table>\
                     <tr>\
-                        <th style="padding: 6px 10px; background: #0F2C59; color: white;" colspan="2">' + rtRwValue + '</th>\
+                        <th style="padding: 10px; background: #0F2C59; color: white; border-radius: 6px 6px 0 0;">Wilayah RT/RW</th>\
                     </tr>\
                     <tr>\
-                        <th style="padding: 6px 10px; background: #f1f5f9;">RT</th>\
-                        <td style="padding: 6px 10px;">' + (feature.properties['RT'] || feature.properties['rt'] || '-') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th style="padding: 6px 10px; background: #f1f5f9;">RW</th>\
-                        <td style="padding: 6px 10px;">' + (feature.properties['RW'] || feature.properties['rw'] || '-') + '</td>\
+                        <td style="padding: 8px; font-size: 1.1em;"><strong>' + rtRw + '</strong></td>\
                     </tr>\
                 </table>';
                 layer.bindPopup(popupContent);
                 
+                // Hover effect
+                var originalColor = rtColors[rtRw] || '#77DD77';
                 layer.on('mouseover', function(e) {
-                    var currentStyle = style_rt_rw_3(feature);
-                    originalStyles[L.stamp(e.target)] = {
-                        weight: currentStyle.weight,
-                        color: currentStyle.color,
-                        fillOpacity: currentStyle.fillOpacity,
-                        fillColor: currentStyle.fillColor
-                    };
                     e.target.setStyle({
-                        weight: 4,
+                        weight: 3,
                         color: '#F59E0B',
-                        fillOpacity: 0.9
+                        fillOpacity: 0.7
                     });
+                    e.target.bringToFront();
                 });
                 layer.on('mouseout', function(e) {
-                    var key = L.stamp(e.target);
-                    if (originalStyles[key]) {
-                        e.target.setStyle(originalStyles[key]);
-                        delete originalStyles[key];
-                    }
+                    e.target.setStyle({
+                        color: '#388636',
+                        weight: 1,
+                        fillOpacity: 0.5,
+                        fillColor: originalColor
+                    });
                 });
             }
         });
-        map.addLayer(layer_rtRw);
+        map.addLayer(layer_rtRW);
 
         // ========== Jalan Desa ==========
         map.createPane('pane_jalan');
         map.getPane('pane_jalan').style.zIndex = 410;
-        
+
         var layer_jalan = new L.geoJson(json_JalanDesaKecitran_4, {
             pane: 'pane_jalan',
             style: function() {
                 return {
                     color: '#FFC107',
                     weight: 3,
-                    opacity: 0.9
+                    opacity: 0.85
                 };
             },
             onEachFeature: function(feature, layer) {
-                if (feature.properties['nama'] || feature.properties['Nama']) {
-                    layer.bindPopup('<strong>' + (feature.properties['nama'] || feature.properties['Nama']) + '</strong>');
-                }
+                // Hover effect
+                layer.on('mouseover', function(e) {
+                    e.target.setStyle({
+                        weight: 5,
+                        color: '#FF9800'
+                    });
+                });
+                layer.on('mouseout', function(e) {
+                    e.target.setStyle({
+                        weight: 3,
+                        color: '#FFC107'
+                    });
+                });
             }
         });
         map.addLayer(layer_jalan);
@@ -698,62 +634,13 @@
         // ========== Landmark & Fasilitas ==========
         map.createPane('pane_landmark');
         map.getPane('pane_landmark').style.zIndex = 500;
-        
+
         var layer_landmark = new L.geoJson(json_LandmarkadminitratifsekolahfaskesTPU_5, {
             pane: 'pane_landmark',
             pointToLayer: function(feature, latlng) {
-                var jenis = (feature.properties['Jenis'] || feature.properties['jenis'] || '').toLowerCase();
-                var icon = '📍';
-                var color = '#607D8B';
-                
-                if (jenis.includes('sekolah') || jenis.includes('sd') || jenis.includes('smp') || jenis.includes('sma')) {
-                    icon = '🏫'; color = '#4CAF50';
-                } else if (jenis.includes('masjid') || jenis.includes('mushola') || jenis.includes('gereja')) {
-                    icon = '🕌'; color = '#9C27B0';
-                } else if (jenis.includes('kantor') || jenis.includes('balai')) {
-                    icon = '🏢'; color = '#2196F3';
-                } else if (jenis.includes('tpu') || jenis.includes('makam')) {
-                    icon = '⚰️'; color = '#607D8B';
-                } else if (jenis.includes('puskesmas') || jenis.includes('klinik') || jenis.includes('rs')) {
-                    icon = '🏥'; color = '#F44336';
-                }
-                
                 return L.marker(latlng, {
                     icon: L.divIcon({
-                        html: '<div style="background:' + color + ';color:#fff;padding:4px;border-radius:50%;font-size:14px;text-align:center;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">' + icon + '</div>',
-                        className: 'custom-marker',
-                        iconSize: [28, 28],
-                        iconAnchor: [14, 14]
-                    })
-                });
-            },
-            onEachFeature: function(feature, layer) {
-                var popupContent = '<table style="font-family: Space Grotesk, sans-serif;">';
-                if (feature.properties['Nama'] || feature.properties['nama']) {
-                    popupContent += '<tr><th style="padding: 6px 10px; background: #0F2C59; color: white;">Nama</th><td style="padding: 6px 10px; font-weight: 600;">' + (feature.properties['Nama'] || feature.properties['nama']) + '</td></tr>';
-                }
-                if (feature.properties['Jenis'] || feature.properties['jenis']) {
-                    popupContent += '<tr><th style="padding: 6px 10px; background: #f1f5f9;">Jenis</th><td style="padding: 6px 10px;">' + (feature.properties['Jenis'] || feature.properties['jenis']) + '</td></tr>';
-                }
-                if (feature.properties['Alamat'] || feature.properties['alamat']) {
-                    popupContent += '<tr><th style="padding: 6px 10px; background: #f1f5f9;">Alamat</th><td style="padding: 6px 10px;">' + (feature.properties['Alamat'] || feature.properties['alamat']) + '</td></tr>';
-                }
-                popupContent += '</table>';
-                layer.bindPopup(popupContent);
-            }
-        });
-        map.addLayer(layer_landmark);
-
-        // ========== Posisi Rumah Saya ==========
-        map.createPane('pane_rumahSaya');
-        map.getPane('pane_rumahSaya').style.zIndex = 600;
-        
-        var layer_rumahSaya = new L.geoJson(json_PosisiRumahSaya_6, {
-            pane: 'pane_rumahSaya',
-            pointToLayer: function(feature, latlng) {
-                return L.marker(latlng, {
-                    icon: L.divIcon({
-                        html: '<div style="background:#F59E0B;color:#fff;padding:6px;border-radius:50%;font-size:16px;text-align:center;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏠</div>',
+                        html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="32" height="32"><defs><filter id="shadowL" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="14" fill="rgba(5, 150, 105, 0.85)" filter="url(#shadowL)"/><text x="18" y="23" text-anchor="middle" font-size="14">📍</text></svg>',
                         className: 'custom-marker',
                         iconSize: [32, 32],
                         iconAnchor: [16, 16]
@@ -761,15 +648,55 @@
                 });
             },
             onEachFeature: function(feature, layer) {
-                layer.bindPopup('<strong>🏠 Rumah Pengembang</strong><br>Sulthon Fadhlun Nafi');
+                var nama = feature.properties['Nama'] || 'Landmark';
+                var popupContent = '<table>\
+                    <tr>\
+                        <th style="padding: 10px; background: #059669; color: white; border-radius: 6px 6px 0 0;">Landmark</th>\
+                    </tr>\
+                    <tr>\
+                        <td style="padding: 8px;"><strong>' + nama + '</strong></td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
             }
         });
+        map.addLayer(layer_landmark);
+
+        // ========== Posisi Rumah Pengembang ==========
+        map.createPane('pane_rumahSaya');
+        map.getPane('pane_rumahSaya').style.zIndex = 501;
+
+        var layer_rumahSaya = new L.geoJson(json_PosisiRumahSaya_6, {
+            pane: 'pane_rumahSaya',
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.divIcon({
+                        html: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36"><defs><filter id="shadowH" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/></filter></defs><circle cx="18" cy="18" r="15" fill="rgba(245, 158, 11, 0.9)" filter="url(#shadowH)"/><text x="18" y="24" text-anchor="middle" font-size="16">🏠</text></svg>',
+                        className: 'custom-marker',
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 18]
+                    })
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                var popupContent = '<table>\
+                    <tr>\
+                        <th style="padding: 10px; background: #F59E0B; color: white; border-radius: 6px 6px 0 0;">🏠 Rumah Pengembang</th>\
+                    </tr>\
+                    <tr>\
+                        <td style="padding: 8px;">Sulthon FN - Universitas Amikom Purwokerto</td>\
+                    </tr>\
+                </table>';
+                layer.bindPopup(popupContent);
+            }
+        });
+        map.addLayer(layer_rumahSaya);
 
         // ========== Layer Toggle Functionality ==========
         var layers = {
-            'desa': layer_desa,
-            'rw': layer_rw,
-            'rtRw': layer_rtRw,
+            'batasDesa': layer_batasDesa,
+            'batasRW': layer_batasRW,
+            'rtRW': layer_rtRW,
             'jalan': layer_jalan,
             'landmark': layer_landmark,
             'rumahSaya': layer_rumahSaya
@@ -789,62 +716,9 @@
             });
         });
 
-        // ========== Search Functionality ==========
-        var searchInput = document.getElementById('featureSearch');
-        var searchResults = document.getElementById('searchResults');
-        var searchableFeatures = [];
-
-        // Collect searchable features
-        layer_rtRw.eachLayer(function(layer) {
-            if (layer.feature) {
-                searchableFeatures.push({
-                    name: 'RT ' + (layer.feature.properties['RT'] || layer.feature.properties['rt'] || '?') + ' / RW ' + (layer.feature.properties['RW'] || layer.feature.properties['rw'] || '?'),
-                    layer: layer,
-                    bounds: layer.getBounds()
-                });
-            }
-        });
-
-        layer_landmark.eachLayer(function(layer) {
-            if (layer.feature && (layer.feature.properties['Nama'] || layer.feature.properties['nama'])) {
-                searchableFeatures.push({
-                    name: layer.feature.properties['Nama'] || layer.feature.properties['nama'],
-                    layer: layer,
-                    latlng: layer.getLatLng()
-                });
-            }
-        });
-
-        searchInput.addEventListener('input', function() {
-            var query = this.value.toLowerCase().trim();
-            searchResults.innerHTML = '';
-            
-            if (query.length < 2) return;
-            
-            var matches = searchableFeatures.filter(function(f) {
-                return f.name.toLowerCase().includes(query);
-            }).slice(0, 10);
-            
-            matches.forEach(function(match) {
-                var btn = document.createElement('button');
-                btn.textContent = match.name;
-                btn.addEventListener('click', function() {
-                    if (match.bounds) {
-                        map.fitBounds(match.bounds, { padding: [50, 50] });
-                    } else if (match.latlng) {
-                        map.setView(match.latlng, 18);
-                    }
-                    match.layer.openPopup();
-                    searchInput.value = '';
-                    searchResults.innerHTML = '';
-                });
-                searchResults.appendChild(btn);
-            });
-        });
-
-        // Fit map to desa bounds
-        map.fitBounds(layer_desa.getBounds(), {
-            padding: [40, 40]
+        // Fit map to show all area
+        map.fitBounds(layer_batasDesa.getBounds(), {
+            padding: [30, 30]
         });
         </script>        
     </body>
