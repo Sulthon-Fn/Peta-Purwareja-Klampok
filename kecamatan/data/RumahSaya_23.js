@@ -1,1 +1,0 @@
-var json_RumahSaya_23 = {"type":"FeatureCollection","name":"RumahSaya_23","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[]}

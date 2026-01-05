@@ -1,0 +1,1 @@
+var json_BalaiDesa_6 = {"type":"FeatureCollection","name":"BalaiDesa_6","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[{"type":"Feature","properties":{"id":"1","Nama":"Balai Desa"},"geometry":{"type":"Point","coordinates":[109.44845925596367,-7.477140464668369]}}]}

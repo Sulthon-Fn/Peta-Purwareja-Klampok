@@ -8,7 +8,7 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="icon" type="image/png" href="../Images/logo-klampok.png">
         <link rel="apple-touch-icon" href="../Images/logo-klampok.png">
-        <title>Peta Desa Kecitran - Geoportal</title>
+        <title>Peta Desa Kalilandak - Geoportal</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -121,6 +121,7 @@
             }
 
             .dropdown-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+            .dropdown-btn.active { background: var(--accent-color); color: var(--primary-color); }
 
             .dropdown-content {
                 display: none;
@@ -150,6 +151,12 @@
             .dropdown-content a:hover {
                 background: rgba(5, 150, 105, 0.1);
                 color: var(--secondary-color);
+            }
+
+            .dropdown-content a.active {
+                background: rgba(245, 158, 11, 0.15);
+                color: var(--accent-color);
+                font-weight: 600;
             }
 
             .dropdown-content a:last-child { border-bottom: none; }
@@ -202,7 +209,7 @@
             .map-header {
                 flex-shrink: 0;
                 padding: 12px 20px;
-                background: linear-gradient(135deg, var(--secondary-color), #047857);
+                background: linear-gradient(135deg, #6366F1, #4F46E5);
                 color: #fff;
             }
 
@@ -274,11 +281,11 @@
                 <nav class="menu">
                     <a href="../index.html">🏠 Beranda</a>
                     <a href="../kecamatan/peta.html">🗺️ Peta Kecamatan</a>
-                    <a href="peta.html" class="active">🏘️ Desa Kecitran</a>
+                    <a href="peta.html">🏘️ Desa Kecitran</a>
                     <div class="dropdown">
-                        <button class="dropdown-btn">📍 Desa Lainnya ▾</button>
+                        <button class="dropdown-btn active">📍 Desa Lainnya ▾</button>
                         <div class="dropdown-content">
-                            <a href="kalilandak.html">🏡 Desa Kalilandak</a>
+                            <a href="kalilandak.html" class="active">🏡 Desa Kalilandak</a>
                             <a href="kalimandi.html">🏡 Desa Kalimandi</a>
                             <a href="kaliwinasuh.html">🏡 Desa Kaliwinasuh</a>
                         </div>
@@ -289,16 +296,16 @@
 
         <div class="page-info">
             <div class="page-info-inner">
-                <h1 class="page-title">🏘️ Peta Desa Kecitran</h1>
-                <p class="page-subtitle">Peta detail Desa Kecitran dengan batas RT/RW, jalan, dan landmark penting</p>
+                <h1 class="page-title">🏡 Peta Desa Kalilandak</h1>
+                <p class="page-subtitle">Peta detail Desa Kalilandak dengan informasi batas wilayah, sawah, dan balai desa</p>
             </div>
         </div>
 
         <div class="map-wrapper">
             <div class="map-header">
-                <h2>📍 Peta Interaktif Desa Kecitran</h2>
+                <h2>📍 Peta Interaktif Desa Kalilandak</h2>
             </div>
-            <iframe src="../desaKecitran/index.html" class="map-frame" title="Peta Desa Kecitran"></iframe>
+            <iframe src="../desaKalilandak/index.html" class="map-frame" title="Peta Desa Kalilandak"></iframe>
         </div>
 
         <footer>
