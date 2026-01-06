@@ -75,7 +75,7 @@
         }
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[-7.493171552446047,109.41826282631513],[-7.44989079387121,109.499195562912]]);
+        }).fitBounds([[-7.493171552446047,109.41826282631513],[-7.44989079387121,109.499195562912]], {padding: [0, 0], maxZoom: 14});
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
