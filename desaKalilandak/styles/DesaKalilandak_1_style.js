@@ -29,3 +29,4 @@ var style_DesaKalilandak_1 = function(feature, resolution){
 
     return style;
 };
+    
